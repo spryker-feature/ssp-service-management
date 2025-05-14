@@ -14,7 +14,7 @@ use Spryker\Yves\Kernel\Widget\AbstractWidget;
  * @method \SprykerFeature\Yves\SspServiceManagement\SspServiceManagementConfig getConfig()
  * @method \SprykerFeature\Yves\SspServiceManagement\SspServiceManagementFactory getFactory()
  */
-class ShipmentTypeServicePointSelectorWidget extends AbstractWidget
+class SspShipmentTypeServicePointSelectorWidget extends AbstractWidget
 {
     /**
      * @var string
@@ -29,7 +29,7 @@ class ShipmentTypeServicePointSelectorWidget extends AbstractWidget
     /**
      * @var string
      */
-    protected const NAME = 'ShipmentTypeServicePointSelectorWidget';
+    protected const NAME = 'SspShipmentTypeServicePointSelectorWidget';
 
     /**
      * @var string
@@ -89,6 +89,11 @@ class ShipmentTypeServicePointSelectorWidget extends AbstractWidget
     /**
      * @var string
      */
+    protected const PARAMETER_HAS_SHIPMENT_TYPE_WITH_REQUIRED_LOCATION = 'hasShipmentTypeWithRequiredLocation';
+
+    /**
+     * @var string
+     */
     protected const DEFAULT_FORM_FIELD_PRODUCT_OFFER_REFERENCE = 'product_offer_reference';
 
     /**
@@ -115,6 +120,9 @@ class ShipmentTypeServicePointSelectorWidget extends AbstractWidget
 
         $shipmentTypes = $shipmentTypeStorageCollection->getShipmentTypeStorages();
         $hasShipmentTypes = $shipmentTypes->count() > 0;
+        /**
+         * @var array<\Generated\Shared\Transfer\ShipmentTypeStorageTransfer> $shipmentTypeList
+         */
         $shipmentTypeList = $shipmentTypes->getArrayCopy();
 
         $shipmentTypeChecker = $this->getFactory()->createShipmentTypeChecker();
@@ -122,12 +130,15 @@ class ShipmentTypeServicePointSelectorWidget extends AbstractWidget
             ->hasOnlyServiceShipmentType($shipmentTypeList);
         $hasOnlyDeliveryShipmentType = $hasShipmentTypes && $shipmentTypeChecker
             ->hasOnlyDeliveryShipmentType($shipmentTypeList);
+        $hasShipmentTypeWithRequiredLocation = $hasShipmentTypes && $shipmentTypeChecker
+            ->hasShipmentTypeWithRequiredLocation($shipmentTypeList);
 
         $this->addProductParameter($productViewTransfer);
         $this->addIsDisabledParameter($isDisabled);
         $this->addShipmentTypeOptionsParameter($shipmentTypeList);
         $this->addHasOnlyServiceShipmentTypeParameter($hasOnlyServiceShipmentType);
         $this->addHasOnlyDeliveryShipmentTypeParameter($hasOnlyDeliveryShipmentType);
+        $this->addHasShipmentTypeWithRequiredLocationParameter($hasShipmentTypeWithRequiredLocation);
         $this->addIsServiceDateTimeEnabledParameter((bool)$productViewTransfer->getIsServiceDateTimeEnabled());
         $this->addFormFieldShipmentTypeUuidParameter();
         $this->addFormFieldServicePointUuidParameter();
@@ -190,15 +201,15 @@ class ShipmentTypeServicePointSelectorWidget extends AbstractWidget
     }
 
     /**
-     * @param array<\Generated\Shared\Transfer\ShipmentTypeTransfer> $shipmentTypeTransfers
+     * @param array<\Generated\Shared\Transfer\ShipmentTypeStorageTransfer> $shipmentTypeStorageTransfers
      *
      * @return void
      */
-    protected function addShipmentTypeOptionsParameter(array $shipmentTypeTransfers): void
+    protected function addShipmentTypeOptionsParameter(array $shipmentTypeStorageTransfers): void
     {
         $this->addParameter(
             static::PARAMETER_SHIPMENT_TYPE_OPTIONS,
-            $this->getFactory()->createShipmentTypeOptionsProvider()->provideShipmentTypeOptions($shipmentTypeTransfers),
+            $this->getFactory()->createShipmentTypeOptionsProvider()->provideShipmentTypeOptions($shipmentTypeStorageTransfers),
         );
     }
 
@@ -264,5 +275,15 @@ class ShipmentTypeServicePointSelectorWidget extends AbstractWidget
     protected function addProductParameter(ProductViewTransfer $productViewTransfer): void
     {
         $this->addParameter(static::PARAMETER_PRODUCT, $productViewTransfer);
+    }
+
+    /**
+     * @param bool $hasShipmentTypeWithRequiredLocation
+     *
+     * @return void
+     */
+    protected function addHasShipmentTypeWithRequiredLocationParameter(bool $hasShipmentTypeWithRequiredLocation): void
+    {
+        $this->addParameter(static::PARAMETER_HAS_SHIPMENT_TYPE_WITH_REQUIRED_LOCATION, $hasShipmentTypeWithRequiredLocation);
     }
 }

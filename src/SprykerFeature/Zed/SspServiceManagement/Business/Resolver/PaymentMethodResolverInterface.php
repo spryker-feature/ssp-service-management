@@ -7,14 +7,16 @@
 
 namespace SprykerFeature\Zed\SspServiceManagement\Business\Resolver;
 
+use Generated\Shared\Transfer\ItemTransfer;
 use Generated\Shared\Transfer\PaymentTransfer;
 
-interface PaymentMethodKeyResolverInterface
+interface PaymentMethodResolverInterface
 {
     /**
+     * @param \Generated\Shared\Transfer\ItemTransfer $itemTransfer
      * @param \Generated\Shared\Transfer\PaymentTransfer $paymentTransfer
      *
      * @return string
      */
-    public function resolvePaymentMethodKey(PaymentTransfer $paymentTransfer): string;
+    public function resolvePaymentMethod(ItemTransfer $itemTransfer, PaymentTransfer $paymentTransfer): string;
 }

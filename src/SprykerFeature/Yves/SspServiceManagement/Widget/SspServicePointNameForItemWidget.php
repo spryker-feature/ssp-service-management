@@ -14,7 +14,7 @@ use Spryker\Yves\Kernel\Widget\AbstractWidget;
  * @method \SprykerFeature\Yves\SspServiceManagement\SspServiceManagementConfig getConfig()
  * @method \SprykerFeature\Yves\SspServiceManagement\SspServiceManagementFactory getFactory()
  */
-class ServicePointNameForItemWidget extends AbstractWidget
+class SspServicePointNameForItemWidget extends AbstractWidget
 {
     /**
      * @var string
@@ -22,11 +22,18 @@ class ServicePointNameForItemWidget extends AbstractWidget
     protected const PARAMETER_SERVICE_POINT_NAME = 'servicePointName';
 
     /**
-     * @param \Generated\Shared\Transfer\ItemTransfer $itemTransfer
+     * @var string
      */
-    public function __construct(ItemTransfer $itemTransfer)
+    protected const PARAMETER_SCHEDULED_AT = 'scheduledAt';
+
+    /**
+     * @param \Generated\Shared\Transfer\ItemTransfer $itemTransfer
+     * @param bool $showServicePointName
+     */
+    public function __construct(ItemTransfer $itemTransfer, bool $showServicePointName = true)
     {
-        $this->addServicePointNameParameter($itemTransfer);
+        $this->addServicePointNameParameter($itemTransfer, $showServicePointName);
+        $this->addScheduledAtParameter($itemTransfer);
     }
 
     /**
@@ -38,7 +45,7 @@ class ServicePointNameForItemWidget extends AbstractWidget
      */
     public static function getName(): string
     {
-        return 'ServicePointNameForItemWidget';
+        return 'SspServicePointNameForItemWidget';
     }
 
     /**
@@ -55,17 +62,34 @@ class ServicePointNameForItemWidget extends AbstractWidget
 
     /**
      * @param \Generated\Shared\Transfer\ItemTransfer $itemTransfer
+     * @param bool $showServicePointName
      *
      * @return void
      */
-    protected function addServicePointNameParameter(ItemTransfer $itemTransfer): void
+    protected function addServicePointNameParameter(ItemTransfer $itemTransfer, bool $showServicePointName = true): void
     {
         $servicePointName = '';
 
-        if ($itemTransfer->getServicePoint()) {
+        if ($showServicePointName && $itemTransfer->getServicePoint()) {
             $servicePointName = $itemTransfer->getServicePointOrFail()->getNameOrFail();
         }
 
         $this->addParameter(static::PARAMETER_SERVICE_POINT_NAME, $servicePointName);
+    }
+
+    /**
+     * @param \Generated\Shared\Transfer\ItemTransfer $itemTransfer
+     *
+     * @return void
+     */
+    protected function addScheduledAtParameter(ItemTransfer $itemTransfer): void
+    {
+        $scheduledAt = null;
+
+        if ($itemTransfer->getMetadata() && $itemTransfer->getMetadataOrFail()->getScheduledAt()) {
+            $scheduledAt = $itemTransfer->getMetadataOrFail()->getScheduledAtOrFail();
+        }
+
+        $this->addParameter(static::PARAMETER_SCHEDULED_AT, $scheduledAt);
     }
 }
